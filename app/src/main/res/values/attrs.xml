@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="Speedometer">
+    <declare-styleable name="SpeedometerCustomView">
         <attr name="maxSpeed" format="float" />
         <attr name="currentSpeed" format="float" />
         <attr name="onColor" format="color" />

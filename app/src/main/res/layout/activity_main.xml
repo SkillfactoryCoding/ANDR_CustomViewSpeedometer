@@ -7,10 +7,11 @@
     android:background="@android:color/darker_gray"
     tools:context=".presentation.view.MainActivity">
 
-    <com.amsdevelops.speedometer.presentation.customviews.SpeedometerCustomView
+    <com.amsdevelops.speedometer.presentation.customviews.speedometer.SpeedometerCustomView
         android:id="@+id/speedometer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:maxSpeed="220"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
