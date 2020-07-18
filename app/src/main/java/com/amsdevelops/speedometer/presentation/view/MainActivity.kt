@@ -11,11 +11,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         button_increase.setOnClickListener {
-            speedometer.onSpeedChanged(speedometer.getCurrentSpeed() + 8)
+            speedometer.onSpeedChanged(speedometer.getCurrentSpeed() + 1)
         }
 
         button_decrease.setOnClickListener {
-            speedometer.onSpeedChanged(speedometer.getCurrentSpeed() - 8)
+            speedometer.onSpeedChanged(speedometer.getCurrentSpeed() - 1)
         }
     }
 }
