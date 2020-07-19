@@ -35,12 +35,12 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
     //Drawing colors
     private var ON_COLOR = Color.argb(255, 0xff, 0xA5, 0x00)
-    private var OFF_COLOR = Color.argb(100, 0x3e, 0x3e, 0x3e)
+    private var OFF_COLOR = Color.WHITE
     private var DIGIT_COLOR = Color.argb(255, 255, 255, 255)
     private var ARROW_COLOR = Color.RED
-    private var BACKGROUND_COLOR = Color.LTGRAY
-    private var SCALE_SIZE = 16f.pxFromSp()
-    private var DIGIT_SPEED_SIZE = 14f.pxFromSp()
+    private var BACKGROUND_COLOR = Color.DKGRAY
+    private var SCALE_SIZE = 60f
+    private var DIGIT_SPEED_SIZE = 55f
     private var DIGIT_SPEED_ENABLED = true
     private var HORIZONTAL_DIGITS = false
 
@@ -86,7 +86,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
         offMarkPaint = Paint().apply {
             color = OFF_COLOR
             style = Paint.Style.FILL_AND_STROKE
-            strokeWidth = 55f
+            strokeWidth = 50f
         }
         digitsPaint = Paint(offMarkPaint).apply {
             strokeWidth = 2f
@@ -129,10 +129,10 @@ class SpeedometerCustomView @JvmOverloads constructor(
         }
 
         oval.set(
-            centerX - radius * 0.9f,
-            centerY - radius * 0.9f,
-            centerX + radius * 0.9f,
-            centerY + radius * 0.9f
+            centerX - radius * 0.95f,
+            centerY - radius * 0.95f,
+            centerX + radius * 0.95f,
+            centerY + radius * 0.95f
         )
 
     }
@@ -234,12 +234,13 @@ class SpeedometerCustomView @JvmOverloads constructor(
         canvas.save()
 
         val countOfDashes = maxSpeed / 10
+        val space = maxSpeed / 20
         for (i in 0 .. maxSpeed.toInt() step 10) {
             val tmp = drawDigit(i)
             digitsPaint.getTextBounds(tmp, 0, tmp.length, rect)
-            val angle = Math.PI * 1.5 / countOfDashes * (i / 10 + 15)
-            val x = (width / 2 + cos(angle) * radius * 0.9 - rect.width() / 2).toFloat()
-            val y = (height / 2 + sin(angle) * radius * 0.9).toFloat()
+            val angle = Math.PI * 1.5 / countOfDashes * (i / 10 + space)
+            val x = (centerX + cos(angle) * radius * 0.9 - rect.width() / 2).toFloat()
+            val y = (centerY + sin(angle) * radius * 0.9).toFloat()
             canvas.drawText(tmp, x, y, digitsPaint)
         }
         canvas.restore()
@@ -275,16 +276,21 @@ class SpeedometerCustomView @JvmOverloads constructor(
         if (digit % 20 == 0) {
             digit.toString()
         } else {
-            "."
+            ""
         }
 
-    private fun drawScaleBackground(canvas: Canvas?) {
+    private fun drawScaleBackground(canvas: Canvas) {
         offPath.reset()
+        val increment = maxSpeed / 40
+        for (i in -225..45 step increment.toInt()) {
+            if (i % 5 == 0) {
+                offPath.addArc(oval, i.toFloat(), 2f)
+            } else {
+                offPath.addArc(oval, i.toFloat(), 1f)
+            }
 
-        for (i in -225..44 step 1) {
-            offPath.addArc(oval, i.toFloat(), 2f)
         }
-        canvas?.drawPath(offPath, offMarkPaint)
+        canvas.drawPath(offPath, offMarkPaint)
     }
 
     private fun setCurrentSpeed(speed: Float) {
