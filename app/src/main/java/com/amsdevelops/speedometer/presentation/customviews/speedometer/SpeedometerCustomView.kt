@@ -232,28 +232,18 @@ class SpeedometerCustomView @JvmOverloads constructor(
         val theeForthCircumference = radius * Math.PI * 1.5
         val increment = 10
 
-        var angle = 0.0
         for (i in 0..maxSpeed.toInt() step increment) {
             val digitText = drawDigit(i)
             val digitTextLength = round(digitsPaint.measureText(digitText))
 
-            if (false) {
-                angle += (2f * Math.PI / maxSpeed / increment) * i
-                val x = radius * sin(angle)
-                val y = radius * cos(angle)
-
-                canvas.drawText(digitText, x.toFloat(),
-                    y.toFloat(), digitsPaint)
-            } else {
-                circle.addCircle(centerX, centerY, radius, Path.Direction.CW)
-                canvas.drawTextOnPath(
-                    digitText,
-                    circle,
-                    ((i * theeForthCircumference / maxSpeed) - digitTextLength/2).toFloat(),
-                    -50f,
-                    digitsPaint
-                )
-            }
+            circle.addCircle(centerX, centerY, radius, Path.Direction.CW)
+            canvas.drawTextOnPath(
+                digitText,
+                circle,
+                ((i * theeForthCircumference / maxSpeed) - digitTextLength/2).toFloat(),
+                -50f,
+                digitsPaint
+            )
         }
 
         canvas.restore()
