@@ -1,7 +1,10 @@
 package com.amsdevelops.speedometer.data
 
-import io.reactivex.Flowable
+import io.reactivex.subjects.BehaviorSubject
 
 class Repository {
-    lateinit var speedCacheMock: Flowable<Int>
+    private val _speedCacheMock = BehaviorSubject.create<Int>()
+
+    val speedCacheMock: BehaviorSubject<Int>
+        get() = _speedCacheMock
 }

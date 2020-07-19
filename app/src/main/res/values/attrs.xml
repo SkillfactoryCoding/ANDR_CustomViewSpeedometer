@@ -4,9 +4,11 @@
         <attr name="maxSpeed" format="float" />
         <attr name="currentSpeed" format="float" />
         <attr name="onColor" format="color" />
-        <attr name="offColor" format="color" />
-        <attr name="scaleColor" format="color" />
+        <attr name="digitColor" format="color" />
+        <attr name="arrowColor" format="color" />
+        <attr name="backgroundColor" format="color" />
         <attr name="scaleTextSize" format="dimension" />
-        <attr name="readingTextSize" format="dimension" />
+        <attr name="digitSpeedTextEnabled" format="boolean" />
+        <attr name="digitSpeedTextSize" format="dimension" />
     </declare-styleable>
 </resources>

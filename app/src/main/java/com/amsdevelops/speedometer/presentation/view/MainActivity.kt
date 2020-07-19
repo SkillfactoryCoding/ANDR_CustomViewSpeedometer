@@ -1,6 +1,5 @@
 package com.amsdevelops.speedometer.presentation.view
 
-import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -39,25 +38,30 @@ class MainActivity : AppCompatActivity() {
         App.instance.appComponent.inject(this)
         autoDisposable.bindTo(lifecycle)
 
-        viewModel.speedLiveData
-            .subscribeOn(Schedulers.io())
+        viewModel.speedData
+            .subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = {
                     Timber.e(it.localizedMessage)
                 },
                 onNext = {
+                    Timber.e(it.toString())
                     speedometer.setSpeedChanged(it.toFloat())
                 }
             )
             .addTo(autoDisposable)
 
         button_increase.setOnClickListener {
-            speedometer.setSpeedChanged(speedometer.getCurrentSpeed() + 5)
+            viewModel.changeSpeed((speedometer.getCurrentSpeed() + 10).toInt())
         }
 
         button_decrease.setOnClickListener {
-            speedometer.setSpeedChanged(speedometer.getCurrentSpeed() - 5)
+            viewModel.changeSpeed((speedometer.getCurrentSpeed() - 10).toInt())
+        }
+
+        button_test.setOnClickListener {
+            viewModel.initTest()
         }
     }
 

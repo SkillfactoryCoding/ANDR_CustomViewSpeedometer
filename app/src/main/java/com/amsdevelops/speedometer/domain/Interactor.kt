@@ -1,18 +1,27 @@
 package com.amsdevelops.speedometer.domain
 
 import com.amsdevelops.speedometer.data.Repository
-import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 class Interactor(val repository: Repository) {
 
-    init {
-        Timber.e(this.toString())
-        repository.speedCacheMock = Flowable.fromIterable(mockSpeedArray())
-            .doOnNext {
-                val randomDelay = (1 .. 2000).random().toLong()
-                Thread.sleep(randomDelay)
-            }
+    fun emitTestSpeedValues() {
+        val testSource = Observable.fromIterable(mockSpeedArray())
+            .subscribeOn(Schedulers.single())
+            .subscribeBy(
+                onError = {
+                    Timber.e(it.localizedMessage)
+                },
+                onNext = {
+                    val randomDelay = (1 .. 2000).random().toLong()
+                    Thread.sleep(randomDelay)
+                    repository.speedCacheMock.onNext(it)
+                }
+            )
+
     }
 
     private fun mockSpeedArray(): Iterable<Int> {
@@ -23,5 +32,9 @@ class Interactor(val repository: Repository) {
         }
         list.add(0)
         return list
+    }
+
+    fun changeSpeed(speed: Int) {
+        repository.speedCacheMock.onNext(speed)
     }
 }

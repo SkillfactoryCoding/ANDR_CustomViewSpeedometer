@@ -8,6 +8,7 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import com.amsdevelops.speedometer.R
 import com.amsdevelops.speedometer.constants.SpeedometerConstants
+import com.amsdevelops.speedometer.extensions.pxFromSp
 import kotlin.math.min
 
 class SpeedometerCustomView @JvmOverloads constructor(
@@ -30,9 +31,12 @@ class SpeedometerCustomView @JvmOverloads constructor(
     //Drawing colors
     private var ON_COLOR = Color.argb(255, 0xff, 0xA5, 0x00)
     private var OFF_COLOR = Color.argb(100, 0x3e, 0x3e, 0x3e)
-    private var SCALE_COLOR = Color.argb(255, 255, 255, 255)
-    private var SCALE_SIZE = 34f
-    private var READING_SIZE = 60f
+    private var DIGIT_COLOR = Color.argb(255, 255, 255, 255)
+    private var ARROW_COLOR = Color.RED
+    private var BACKGROUND_COLOR = Color.LTGRAY
+    private var SCALE_SIZE = 16f.pxFromSp()
+    private var DIGIT_SPEED_SIZE = 14f.pxFromSp()
+    private var DIGIT_SPEED_ENABLED = true
 
     //Scale configuration
     private var centerX = 0f
@@ -40,22 +44,25 @@ class SpeedometerCustomView @JvmOverloads constructor(
     private var radius = 0f
 
     init {
-        val attributes = context.theme.obtainStyledAttributes(attrs, R.styleable.SpeedometerCustomView, 0, 0)
+        val a = context.theme.obtainStyledAttributes(attrs, R.styleable.SpeedometerCustomView, 0, 0)
 
         try {
-            maxSpeed = attributes.getFloat(
+            maxSpeed = a.getFloat(
                 R.styleable.SpeedometerCustomView_maxSpeed,
                 SpeedometerConstants.DEFAULT_MAX_SPEED
             )
-            currentSpeed = attributes.getFloat(R.styleable.SpeedometerCustomView_currentSpeed, 0f)
-            ON_COLOR = attributes.getColor(R.styleable.SpeedometerCustomView_onColor, ON_COLOR)
-            OFF_COLOR = attributes.getColor(R.styleable.SpeedometerCustomView_offColor, OFF_COLOR)
-            SCALE_COLOR = attributes.getColor(R.styleable.SpeedometerCustomView_scaleColor, SCALE_COLOR)
-            SCALE_SIZE = attributes.getDimension(R.styleable.SpeedometerCustomView_scaleTextSize, SCALE_SIZE)
-            READING_SIZE =
-                attributes.getDimension(R.styleable.SpeedometerCustomView_readingTextSize, READING_SIZE)
+            currentSpeed = a.getFloat(R.styleable.SpeedometerCustomView_currentSpeed, 0f)
+            ON_COLOR = a.getColor(R.styleable.SpeedometerCustomView_onColor, ON_COLOR)
+            DIGIT_COLOR = a.getColor(R.styleable.SpeedometerCustomView_digitColor, DIGIT_COLOR)
+            ARROW_COLOR = a.getColor(R.styleable.SpeedometerCustomView_arrowColor, ARROW_COLOR)
+            BACKGROUND_COLOR = a.getColor(R.styleable.SpeedometerCustomView_backgroundColor, BACKGROUND_COLOR)
+            SCALE_SIZE = a.getDimension(R.styleable.SpeedometerCustomView_scaleTextSize, SCALE_SIZE)
+            DIGIT_SPEED_SIZE =
+                a.getDimension(R.styleable.SpeedometerCustomView_digitSpeedTextSize, DIGIT_SPEED_SIZE)
+            DIGIT_SPEED_ENABLED =
+                a.getBoolean(R.styleable.SpeedometerCustomView_digitSpeedTextEnabled, DIGIT_SPEED_ENABLED)
         } finally {
-            attributes.recycle()
+            a.recycle()
         }
 
         initDrawingTools()
@@ -78,12 +85,12 @@ class SpeedometerCustomView @JvmOverloads constructor(
             strokeWidth = 2f
             textSize = SCALE_SIZE
             setShadowLayer(5f, 0f, 0f, Color.RED)
-            color = SCALE_COLOR
+            color = DIGIT_COLOR
         }
         readingPaint = Paint(scalePaint).apply {
             style = Paint.Style.FILL_AND_STROKE
             setShadowLayer(3f, 0f, 0f, Color.WHITE)
-            textSize = 65f
+            textSize = DIGIT_SPEED_SIZE
             typeface = Typeface.SANS_SERIF
             color = Color.WHITE
         }
@@ -153,7 +160,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
         drawLegend(canvas)
         drawArrow(canvas)
 
-        drawReadings(canvas)
+        if (DIGIT_SPEED_ENABLED) drawReadings(canvas)
     }
     var objectAnimator: ObjectAnimator? = null
     private fun setSpeedAnimated(speed: Float) {
@@ -177,7 +184,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
         canvas.rotate(limit, centerX, centerY)
 
         val paintArrow = Paint().apply {
-            color = Color.RED
+            color = ARROW_COLOR
             strokeWidth = (22f)
         }
         canvas.drawLine(centerX, centerY, radius * 2, radius * 2, paintArrow)
@@ -193,7 +200,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
     private fun drawGaugeBackground(canvas: Canvas) {
         val paintBackground = Paint().apply {
-            color = Color.LTGRAY
+            color = BACKGROUND_COLOR
             style = Paint.Style.FILL
         }
 
@@ -226,7 +233,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
             canvas.drawTextOnPath(
                 drawDigit(i),
                 circle,
-                (i * halfCircumference / maxSpeed).toFloat(),
+                ((i * halfCircumference / maxSpeed)).toFloat(),
                 -50f,
                 scalePaint
             )
