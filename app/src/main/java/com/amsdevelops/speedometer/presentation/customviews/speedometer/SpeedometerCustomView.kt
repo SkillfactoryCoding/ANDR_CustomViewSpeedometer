@@ -30,6 +30,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
     private lateinit var readingPaint: Paint
     private lateinit var onPath: Path
     private lateinit var offPath: Path
+    private val rect = Rect()
     private var oval = RectF()
 
     //Drawing colors
@@ -41,6 +42,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
     private var SCALE_SIZE = 16f.pxFromSp()
     private var DIGIT_SPEED_SIZE = 14f.pxFromSp()
     private var DIGIT_SPEED_ENABLED = true
+    private var HORIZONTAL_DIGITS = false
 
     //Scale configuration
     private var centerX = 0f
@@ -65,6 +67,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
                 a.getDimension(R.styleable.SpeedometerCustomView_digitSpeedTextSize, DIGIT_SPEED_SIZE)
             DIGIT_SPEED_ENABLED =
                 a.getBoolean(R.styleable.SpeedometerCustomView_digitSpeedTextEnabled, DIGIT_SPEED_ENABLED)
+            HORIZONTAL_DIGITS = a.getBoolean(R.styleable.SpeedometerCustomView_horizontalDigits, HORIZONTAL_DIGITS)
         } finally {
             a.recycle()
         }
@@ -120,16 +123,16 @@ class SpeedometerCustomView @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         //Setting up the oval area in which the arc will be drawn
         radius = if (width > height) {
-            height.div(2.5f)
+            height.div(2f)
         } else {
-            width.div(2.5f)
+            width.div(2f)
         }
 
         oval.set(
-            centerX - radius,
-            centerY - radius,
-            centerX + radius,
-            centerY + radius
+            centerX - radius * 0.9f,
+            centerY - radius * 0.9f,
+            centerX + radius * 0.9f,
+            centerY + radius * 0.9f
         )
 
     }
@@ -161,7 +164,11 @@ class SpeedometerCustomView @JvmOverloads constructor(
         super.onDraw(canvas)
         drawGaugeBackground(canvas)
         drawScaleBackground(canvas)
-        drawLegend(canvas)
+        if (HORIZONTAL_DIGITS) {
+            drawLegendHorizontally(canvas)
+        } else {
+            drawLegendAroundCircle(canvas)
+        }
         drawArrow(canvas)
 
         if (DIGIT_SPEED_ENABLED) drawReadings(canvas)
@@ -181,7 +188,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
     }
 
     private fun drawArrow(canvas: Canvas) {
-        val limit = (currentSpeed / maxSpeed * 270 - 270)
+        val limit = (currentSpeed / maxSpeed * 270 - 135)
 
         canvas.save()
 
@@ -191,7 +198,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
             color = ARROW_COLOR
             strokeWidth = (22f)
         }
-        canvas.drawLine(centerX, centerY, radius * 2, radius * 2, paintArrow)
+        canvas.drawLine(centerX, centerY, radius, 100f, paintArrow)
 
         val paintArrowHolder = Paint().apply {
             color = Color.DKGRAY
@@ -208,7 +215,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
             style = Paint.Style.FILL
         }
 
-        canvas.drawCircle(centerX, centerY, radius + 40f.pxFromDp(), paintBackground)
+        canvas.drawCircle(centerX, centerY, radius, paintBackground)
     }
 
     private fun drawReadings(canvas: Canvas) {
@@ -223,25 +230,40 @@ class SpeedometerCustomView @JvmOverloads constructor(
         canvas.drawTextOnPath(message, path, 0f, 20f, readingPaint)
     }
 
-    private fun drawLegend(canvas: Canvas) {
+    private fun drawLegendHorizontally(canvas: Canvas) {
+        canvas.save()
+
+        val countOfDashes = maxSpeed / 10
+        for (i in 0 .. maxSpeed.toInt() step 10) {
+            val tmp = drawDigit(i)
+            digitsPaint.getTextBounds(tmp, 0, tmp.length, rect)
+            val angle = Math.PI * 1.5 / countOfDashes * (i / 10 + 15)
+            val x = (width / 2 + cos(angle) * radius * 0.9 - rect.width() / 2).toFloat()
+            val y = (height / 2 + sin(angle) * radius * 0.9).toFloat()
+            canvas.drawText(tmp, x, y, digitsPaint)
+        }
+        canvas.restore()
+    }
+
+    private fun drawLegendAroundCircle(canvas: Canvas) {
         canvas.save()
 
         canvas.rotate(135f, centerX, centerY)
         val circle = Path()
 
-        val theeForthCircumference = radius * Math.PI * 1.5
+        val theeForthCircumference = radius * 0.9 * Math.PI * 1.5
         val increment = 10
 
         for (i in 0..maxSpeed.toInt() step increment) {
             val digitText = drawDigit(i)
             val digitTextLength = round(digitsPaint.measureText(digitText))
 
-            circle.addCircle(centerX, centerY, radius, Path.Direction.CW)
+            circle.addCircle(centerX, centerY, radius * 0.9f, Path.Direction.CW)
             canvas.drawTextOnPath(
                 digitText,
                 circle,
                 ((i * theeForthCircumference / maxSpeed) - digitTextLength/2).toFloat(),
-                -50f,
+                0f,
                 digitsPaint
             )
         }
@@ -253,7 +275,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
         if (digit % 20 == 0) {
             digit.toString()
         } else {
-            "|"
+            "."
         }
 
     private fun drawScaleBackground(canvas: Canvas?) {

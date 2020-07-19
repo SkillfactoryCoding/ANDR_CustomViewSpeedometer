@@ -9,6 +9,7 @@
         <attr name="backgroundColor" format="color" />
         <attr name="scaleTextSize" format="dimension" />
         <attr name="digitSpeedTextEnabled" format="boolean" />
+        <attr name="horizontalDigits" format="boolean" />
         <attr name="digitSpeedTextSize" format="dimension" />
     </declare-styleable>
 </resources>
