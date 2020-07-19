@@ -8,8 +8,12 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import com.amsdevelops.speedometer.R
 import com.amsdevelops.speedometer.constants.SpeedometerConstants
+import com.amsdevelops.speedometer.extensions.pxFromDp
 import com.amsdevelops.speedometer.extensions.pxFromSp
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.round
+import kotlin.math.sin
 
 class SpeedometerCustomView @JvmOverloads constructor(
     context: Context,
@@ -22,7 +26,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
     private lateinit var onMarkPaint: Paint
     private lateinit var offMarkPaint: Paint
-    private lateinit var scalePaint: Paint
+    private lateinit var digitsPaint: Paint
     private lateinit var readingPaint: Paint
     private lateinit var onPath: Path
     private lateinit var offPath: Path
@@ -81,13 +85,13 @@ class SpeedometerCustomView @JvmOverloads constructor(
             style = Paint.Style.FILL_AND_STROKE
             strokeWidth = 55f
         }
-        scalePaint = Paint(offMarkPaint).apply {
+        digitsPaint = Paint(offMarkPaint).apply {
             strokeWidth = 2f
             textSize = SCALE_SIZE
             setShadowLayer(5f, 0f, 0f, Color.RED)
             color = DIGIT_COLOR
         }
-        readingPaint = Paint(scalePaint).apply {
+        readingPaint = Paint(digitsPaint).apply {
             style = Paint.Style.FILL_AND_STROKE
             setShadowLayer(3f, 0f, 0f, Color.WHITE)
             textSize = DIGIT_SPEED_SIZE
@@ -204,7 +208,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
             style = Paint.Style.FILL
         }
 
-        canvas.drawCircle(centerX, centerY, radius + 100f, paintBackground)
+        canvas.drawCircle(centerX, centerY, radius + 40f.pxFromDp(), paintBackground)
     }
 
     private fun drawReadings(canvas: Canvas) {
@@ -225,18 +229,31 @@ class SpeedometerCustomView @JvmOverloads constructor(
         canvas.rotate(135f, centerX, centerY)
         val circle = Path()
 
-        val halfCircumference = radius * Math.PI * 1.5
+        val theeForthCircumference = radius * Math.PI * 1.5
         val increment = 10
 
+        var angle = 0.0
         for (i in 0..maxSpeed.toInt() step increment) {
-            circle.addCircle(centerX, centerY, radius, Path.Direction.CW)
-            canvas.drawTextOnPath(
-                drawDigit(i),
-                circle,
-                ((i * halfCircumference / maxSpeed)).toFloat(),
-                -50f,
-                scalePaint
-            )
+            val digitText = drawDigit(i)
+            val digitTextLength = round(digitsPaint.measureText(digitText))
+
+            if (false) {
+                angle += (2f * Math.PI / maxSpeed / increment) * i
+                val x = radius * sin(angle)
+                val y = radius * cos(angle)
+
+                canvas.drawText(digitText, x.toFloat(),
+                    y.toFloat(), digitsPaint)
+            } else {
+                circle.addCircle(centerX, centerY, radius, Path.Direction.CW)
+                canvas.drawTextOnPath(
+                    digitText,
+                    circle,
+                    ((i * theeForthCircumference / maxSpeed) - digitTextLength/2).toFloat(),
+                    -50f,
+                    digitsPaint
+                )
+            }
         }
 
         canvas.restore()

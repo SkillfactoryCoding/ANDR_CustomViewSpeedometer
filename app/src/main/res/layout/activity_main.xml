@@ -11,7 +11,7 @@
         android:id="@+id/speedometer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:maxSpeed="160"
+        app:maxSpeed="220"
         app:currentSpeed="0"
         app:onColor="@color/colorAccent"
         app:digitColor="@color/colorAccent"
