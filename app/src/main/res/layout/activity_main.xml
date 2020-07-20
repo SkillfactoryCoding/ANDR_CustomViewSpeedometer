@@ -6,19 +6,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/darker_gray"
     tools:context=".presentation.view.MainActivity">
-
+    <!--
+        View attributes:
+            maxSpeed - sets max speed
+            currentSpeed - sets arrow to desired speed
+            dashColor - sets color of dashes
+            digitColor - sets color of digits
+            arrowColor - sets color of arrow
+            backgroundColor - sets color of background
+            scaleTextSize - sets text size
+            digitSpeedTextEnabled - sets speed to be displayed in arrow placeholder circle
+            horizontalDigits - set digits to be displayed in horizontal mode
+            dashesStep - sets amount of dashes
+        -->
     <com.amsdevelops.speedometer.presentation.customviews.speedometer.SpeedometerCustomView
         android:id="@+id/speedometer"
         android:layout_margin="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:horizontalDigits="false"
+        app:maxSpeed="180"
+        app:currentSpeed="10"
+        app:dashesStep="2"
+        app:dashColor="@android:color/white"
+        app:digitColor="@android:color/white"
+        app:arrowColor="@android:color/holo_red_dark"
+        app:backgroundColor="@android:color/background_dark"
         app:scaleTextSize="20sp"
+        app:digitSpeedTextEnabled="true"
+        app:horizontalDigits="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:maxSpeed="180" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_decrease"
@@ -27,7 +46,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginBottom="16dp"
-        android:text="decrease"
+        android:text="@string/minus_ten"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -38,7 +57,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        android:text="increase"
+        android:text="@string/plus_ten"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -47,7 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:text="Init test"
+        android:text="@string/init_test"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button_increase"
         app:layout_constraintStart_toEndOf="@+id/button_decrease" />

@@ -21,25 +21,26 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
     private var maxSpeed = 0f
     private var currentSpeed = 0f
+    private lateinit var objectAnimator: ObjectAnimator
 
-    private lateinit var onMarkPaint: Paint
     private lateinit var dashPaintThin: Paint
     private lateinit var dashPaintWide: Paint
     private lateinit var digitsPaintBold: Paint
     private lateinit var digitsPaintThin: Paint
     private lateinit var readingPaint: Paint
-    private lateinit var onPath: Path
-    private lateinit var offPath: Path
+    private lateinit var paintBackground: Paint
+    private lateinit var paintArrow: Paint
+    private lateinit var paintArrowHolderFill: Paint
+    private lateinit var paintArrowHolderStroke: Paint
     private val rect = Rect()
-    private var oval = RectF()
 
     //Drawing colors
-    private var ON_COLOR = Color.argb(255, 0xff, 0xA5, 0x00)
-    private var OFF_COLOR = Color.WHITE
-    private var DIGIT_COLOR = Color.argb(255, 255, 255, 255)
+    private var DASH_COLOR = Color.WHITE
+    private var DIGIT_COLOR = Color.WHITE
     private var ARROW_COLOR = Color.RED
     private var BACKGROUND_COLOR = Color.DKGRAY
     private var SCALE_SIZE = 60f
+    private var DASHES_STEP = 2
     private var DIGIT_SPEED_ENABLED = true
     private var HORIZONTAL_DIGITS = false
 
@@ -57,14 +58,15 @@ class SpeedometerCustomView @JvmOverloads constructor(
                 SpeedometerConstants.DEFAULT_MAX_SPEED
             )
             currentSpeed = a.getFloat(R.styleable.SpeedometerCustomView_currentSpeed, 0f)
-            ON_COLOR = a.getColor(R.styleable.SpeedometerCustomView_onColor, ON_COLOR)
             DIGIT_COLOR = a.getColor(R.styleable.SpeedometerCustomView_digitColor, DIGIT_COLOR)
+            DASH_COLOR = a.getColor(R.styleable.SpeedometerCustomView_dashColor, DASH_COLOR)
             ARROW_COLOR = a.getColor(R.styleable.SpeedometerCustomView_arrowColor, ARROW_COLOR)
             BACKGROUND_COLOR = a.getColor(R.styleable.SpeedometerCustomView_backgroundColor, BACKGROUND_COLOR)
             SCALE_SIZE = a.getDimension(R.styleable.SpeedometerCustomView_scaleTextSize, SCALE_SIZE)
             DIGIT_SPEED_ENABLED =
                 a.getBoolean(R.styleable.SpeedometerCustomView_digitSpeedTextEnabled, DIGIT_SPEED_ENABLED)
             HORIZONTAL_DIGITS = a.getBoolean(R.styleable.SpeedometerCustomView_horizontalDigits, HORIZONTAL_DIGITS)
+            DASHES_STEP = a.getInt(R.styleable.SpeedometerCustomView_dashesStep, DASHES_STEP)
         } finally {
             a.recycle()
         }
@@ -73,20 +75,13 @@ class SpeedometerCustomView @JvmOverloads constructor(
     }
 
     private fun initDrawingTools() {
-        onMarkPaint = Paint().apply {
-            style = Paint.Style.STROKE
-            color = ON_COLOR
-            strokeWidth = 155f//dash length
-            setShadowLayer(0f, 0f, 0f, ON_COLOR)
-            isAntiAlias = true
-        }
         dashPaintThin = Paint().apply {
-            color = OFF_COLOR
+            color = DASH_COLOR
             style = Paint.Style.FILL_AND_STROKE
             strokeWidth = 0.01f
         }
         dashPaintWide = Paint().apply {
-            color = OFF_COLOR
+            color = DASH_COLOR
             style = Paint.Style.FILL_AND_STROKE
             strokeWidth = 0.03f
         }
@@ -109,24 +104,26 @@ class SpeedometerCustomView @JvmOverloads constructor(
             typeface = Typeface.SANS_SERIF
             color = Color.WHITE
         }
-
-        onPath = Path()
-        offPath = Path()
-    }
-
-    fun getCurrentSpeed() = currentSpeed
-
-    private fun checkLimits(speed: Float)= when {
-            speed > maxSpeed -> {
-                maxSpeed
-            }
-            speed < 0 -> {
-                0f
-            }
-            else -> {
-                speed
-            }
+        paintBackground = Paint().apply {
+            color = BACKGROUND_COLOR
+            style = Paint.Style.FILL
         }
+        paintArrow = Paint().apply {
+            color = ARROW_COLOR
+            strokeWidth = 15f
+            setShadowLayer(5f, 0f, 0f, ARROW_COLOR)
+        }
+        paintArrowHolderFill = Paint().apply {
+            color = Color.DKGRAY
+            style = Paint.Style.FILL
+            setShadowLayer(5f, 0f, 0f, DASH_COLOR)
+        }
+        paintArrowHolderStroke = Paint().apply {
+            strokeWidth = 5f
+            color = DASH_COLOR
+            style = Paint.Style.STROKE
+        }
+    }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         radius = if (width > height) {
@@ -134,14 +131,6 @@ class SpeedometerCustomView @JvmOverloads constructor(
         } else {
             width.div(2f)
         }
-
-        oval.set(
-            centerX - radius * 0.95f,
-            centerY - radius * 0.95f,
-            centerX + radius * 0.95f,
-            centerY + radius * 0.95f
-        )
-
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -169,6 +158,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
         drawGaugeBackground(canvas)
         drawScaleBackground(canvas)
         if (HORIZONTAL_DIGITS) {
@@ -177,73 +167,42 @@ class SpeedometerCustomView @JvmOverloads constructor(
             drawLegendAroundCircle(canvas)
         }
         drawArrow(canvas)
-
         if (DIGIT_SPEED_ENABLED) drawReadings(canvas)
-    }
-    var objectAnimator: ObjectAnimator? = null
-    private fun setSpeedAnimated(speed: Float) {
-        if (objectAnimator != null) {
-            objectAnimator?.cancel()
-        }
-
-        objectAnimator = ObjectAnimator.ofFloat(this, "currentSpeed", currentSpeed, speed).apply {
-            duration = 500
-            interpolator = AccelerateDecelerateInterpolator()
-        }
-
-        objectAnimator?.start()
-    }
-
-    private fun drawArrow(canvas: Canvas) {
-        val limit = (currentSpeed / maxSpeed * 270 - 135)
-
-        canvas.save()
-
-        canvas.rotate(limit, centerX, centerY)
-
-        val paintArrow = Paint().apply {
-            color = ARROW_COLOR
-            strokeWidth = (22f)
-            setShadowLayer(5f, 0f, 0f, ARROW_COLOR)
-        }
-        canvas.drawLine(centerX, centerY, radius, radius * 0.15f, paintArrow)
-
-        val stroke = Paint().apply {
-            strokeWidth = 5f
-            color = OFF_COLOR
-            style = Paint.Style.STROKE
-        }
-
-        val paintArrowHolder = Paint(stroke).apply {
-            color = Color.DKGRAY
-            style = Paint.Style.FILL
-            setShadowLayer(5f, 0f, 0f, OFF_COLOR)
-        }
-        canvas.drawCircle(centerX, centerY, radius / 7, paintArrowHolder)
-        canvas.drawCircle(centerX, centerY, radius / 7, stroke)
-
-        canvas.restore()
     }
 
     private fun drawGaugeBackground(canvas: Canvas) {
-        val paintBackground = Paint().apply {
-            color = BACKGROUND_COLOR
-            style = Paint.Style.FILL
-        }
-
         canvas.drawCircle(centerX, centerY, radius, paintBackground)
     }
 
-    private fun drawReadings(canvas: Canvas) {
-        val rect = Rect()
-        val message = String.format("%d", currentSpeed.toInt())
+    private fun drawScaleBackground(canvas: Canvas) {
+        canvas.save()
+        canvas.translate(centerX, centerY)
+        canvas.rotate(135f)
+        canvas.scale(centerX, centerY)
 
-        readingPaint.getTextBounds(message, 0, message.length, rect)
+        val scale = 0.93f
 
-        val x = centerX - rect.width() / 2
-        val y = centerY + rect.height() / 2
+        val step = Math.PI * 1.5 / maxSpeed
 
-        canvas.drawText(message, x, y, readingPaint)
+        for (i in 0 .. maxSpeed.toInt() step DASHES_STEP) {
+            val angle = Math.PI * 1.5 - (step * i)
+            val x1 = (cos(angle)).toFloat()
+            val y1 = (sin(angle)).toFloat()
+
+            val x2: Float
+            val y2: Float
+
+            x2 = x1 * scale
+            y2 = y1 * scale
+
+            if (i % 10 == 0) {
+                canvas.drawLine( x1, y1, x2, y2, dashPaintWide)
+            } else {
+                canvas.drawLine( x1, y1, x2, y2, dashPaintThin)
+            }
+
+        }
+        canvas.restore()
     }
 
     private fun drawLegendHorizontally(canvas: Canvas) {
@@ -251,12 +210,17 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
         val countOfDashes = maxSpeed / 10
         val space = maxSpeed / 20
+
         for (i in 0 .. maxSpeed.toInt() step 10) {
             val tmp = i.toString()
+
             digitsPaintBold.getTextBounds(tmp, 0, tmp.length, rect)
+
             val angle = Math.PI * 1.5 / countOfDashes * (i / 10 + space)
+
             val x = (centerX + cos(angle) * radius * 0.8 - rect.width() / 2).toFloat()
             val y = (centerY + sin(angle) * radius * 0.8 + rect.height() / 2).toFloat()
+
             canvas.drawText(tmp, x, y, digitThickness(i))
         }
 
@@ -296,42 +260,48 @@ class SpeedometerCustomView @JvmOverloads constructor(
             digitsPaintThin
         }
 
-    private fun drawScaleBackground(canvas: Canvas) {
+    private fun drawArrow(canvas: Canvas) {
+        val limit = (currentSpeed / maxSpeed * 270 - 135)
+
         canvas.save()
-        canvas.translate(centerX, centerY)
-        canvas.rotate(135f)
-        canvas.scale(centerX, centerY)
 
-        val scale = 0.93f
+        canvas.rotate(limit, centerX, centerY)
 
-        val paint = Paint().apply {
-            strokeWidth = 0.5f
-            style = Paint.Style.STROKE
-            color = Color.WHITE
-        }
-        canvas.drawCircle(0f, 0f, radius, paint)
+        canvas.drawLine(centerX, centerY, radius, radius * 0.15f, paintArrow)
 
-        val step = Math.PI * 1.5 / maxSpeed
+        canvas.drawCircle(centerX, centerY, radius / 7, paintArrowHolderFill)
+        canvas.drawCircle(centerX, centerY, radius / 7, paintArrowHolderStroke)
 
-        for (i in 0 .. maxSpeed.toInt() step 2) {
-            val angle = Math.PI * 1.5 - (step * i)
-            val x1 = (cos(angle)).toFloat()
-            val y1 = (sin(angle)).toFloat()
-
-            val x2: Float
-            val y2: Float
-
-            x2 = x1 * scale
-            y2 = y1 * scale
-
-            if (i % 10 == 0) {
-                canvas.drawLine( x1, y1, x2, y2, dashPaintWide)
-            } else {
-                canvas.drawLine( x1, y1, x2, y2, dashPaintThin)
-            }
-
-        }
         canvas.restore()
+    }
+
+    private fun drawReadings(canvas: Canvas) {
+        val path = Path()
+
+        val message = String.format("%d", currentSpeed.toInt())
+        val widths = FloatArray(message.length)
+        readingPaint.getTextWidths(message, widths)
+
+        var advance = 0f
+        for (width in widths) advance += width
+
+        path.moveTo(centerX - advance / 2, centerY)
+        path.lineTo(centerX + advance / 2, centerY)
+        canvas.drawTextOnPath(message, path, 0f, SCALE_SIZE / 2.5f, readingPaint)
+
+    }
+
+    override fun setSpeedChanged(speed: Float) {
+        setSpeedAnimated(speed)
+    }
+
+    private fun setSpeedAnimated(speed: Float) {
+        objectAnimator = ObjectAnimator.ofFloat(this, "currentSpeed", currentSpeed, speed).apply {
+            duration = 500
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+
+        objectAnimator.start()
     }
 
     private fun setCurrentSpeed(speed: Float) {
@@ -339,8 +309,17 @@ class SpeedometerCustomView @JvmOverloads constructor(
         invalidate()
     }
 
-    override fun setSpeedChanged(speed: Float) {
-        setSpeedAnimated(speed)
+    private fun checkLimits(speed: Float)= when {
+        speed > maxSpeed -> {
+            maxSpeed
+        }
+        speed < 0 -> {
+            0f
+        }
+        else -> {
+            speed
+        }
     }
 
+    fun getCurrentSpeed() = currentSpeed
 }

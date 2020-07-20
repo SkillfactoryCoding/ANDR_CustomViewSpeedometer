@@ -7,7 +7,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.amsdevelops.speedometer.App
 import com.amsdevelops.speedometer.R
-import com.amsdevelops.speedometer.domain.Interactor
 import com.amsdevelops.speedometer.extensions.addTo
 import com.amsdevelops.speedometer.presentation.viewmodel.AutoDisposable
 import com.amsdevelops.speedometer.presentation.viewmodel.SpeedometerViewModel
@@ -20,9 +19,6 @@ import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
-    @Inject
-    lateinit var interactor: Interactor
-
     @Inject
     lateinit var autoDisposable: AutoDisposable
 
