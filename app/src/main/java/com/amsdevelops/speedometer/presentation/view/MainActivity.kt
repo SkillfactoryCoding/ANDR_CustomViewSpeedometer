@@ -3,6 +3,7 @@ package com.amsdevelops.speedometer.presentation.view
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.amsdevelops.speedometer.App
@@ -61,26 +62,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initFullScreen() {
-        val currentApiVersion = Build.VERSION.SDK_INT
-
-        val flags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+    private fun initFullScreen() {val flags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                or View.KEEP_SCREEN_ON)
 
-        if (currentApiVersion >= Build.VERSION_CODES.KITKAT) {
-            window.decorView.systemUiVisibility = flags
+        window.decorView.systemUiVisibility = flags
 
-            val decorView = window.decorView
-            decorView
-                .setOnSystemUiVisibilityChangeListener { visibility ->
-                    if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
-                        decorView.systemUiVisibility = flags
-                    }
+        val decorView = window.decorView
+        decorView
+            .setOnSystemUiVisibilityChangeListener { visibility ->
+                if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
+                    decorView.systemUiVisibility = flags
                 }
-        }
+            }
+
     }
 }

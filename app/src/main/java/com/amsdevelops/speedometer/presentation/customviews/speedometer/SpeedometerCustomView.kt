@@ -123,7 +123,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
         }
         paintArrow = Paint().apply {
             color = ARROW_COLOR
-            strokeWidth = 15f
+            strokeWidth = SCALE_SIZE / 4
             setShadowLayer(5f, 0f, 0f, ARROW_COLOR)
         }
         paintArrowHolderFill = Paint().apply {
@@ -194,54 +194,6 @@ class SpeedometerCustomView @JvmOverloads constructor(
         invalidate()
     }
 
-    private fun drawHands(canvas: Canvas) {
-        canvas.save()
-
-        canvas.translate(centerX, centerY)
-        canvas.scale(scaleX * 0.3f, scaleY * 0.3f)
-
-        val calendar = Calendar.getInstance()
-        var hour = calendar.get(Calendar.HOUR_OF_DAY)
-        hour = if (hour > 12) {
-            hour - 12
-        } else {
-            hour
-        }
-
-        drawHand(canvas, ((hour + calendar.get(Calendar.MINUTE) / 60) * 5f).toDouble(), 1)
-        drawHand(canvas, calendar.get(Calendar.MINUTE).toDouble(), 2)
-        drawHand(canvas, calendar.get(Calendar.SECOND).toDouble(), 3)
-
-        canvas.restore()
-    }
-
-    private fun drawHand(canvas: Canvas, loc: Double, hand: Int) {
-        val paintHands = Paint().apply {
-            color = Color.WHITE
-            style = Paint.Style.STROKE
-
-
-            when (hand) {
-                1 -> strokeWidth = SCALE_SIZE * 0.5f
-                2 -> strokeWidth = SCALE_SIZE * 0.3f
-                3 -> {
-                    strokeWidth = SCALE_SIZE * 0.3f
-                    color = ARROW_COLOR
-                }
-            }
-        }
-        val angle = Math.PI * loc / 30 - Math.PI / 2
-        val handRadius = if (hand == 1) {
-            radius * 0.7
-        } else {
-            radius * 0.9
-        }
-        canvas.drawLine(0f, centerY * 2,
-            (cos(angle) * handRadius).toFloat(),
-            (centerY * 2 + sin(angle) * handRadius).toFloat(),
-            paintHands
-        )
-    }
 
     private fun drawGaugeBackground(canvas: Canvas) {
         canvas.drawCircle(centerX, centerY, radius, paintBackground)
@@ -387,6 +339,59 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
         canvas.restore()
     }
+
+    private fun drawHands(canvas: Canvas) {
+        canvas.save()
+
+        canvas.translate(centerX, centerY)
+        canvas.scale(scaleX * 0.3f, scaleY * 0.3f)
+
+        val calendar = Calendar.getInstance()
+        var hour = calendar.get(Calendar.HOUR_OF_DAY)
+        hour = if (hour > 12) {
+            hour - 12
+        } else {
+            hour
+        }
+
+        drawHand(canvas, ((hour + calendar.get(Calendar.MINUTE) / 60) * 5f).toDouble(), 1)
+        drawHand(canvas, calendar.get(Calendar.MINUTE).toDouble(), 2)
+        drawHand(canvas, calendar.get(Calendar.SECOND).toDouble(), 3)
+
+        canvas.drawCircle(0f, centerY * 2f, radius / 6, paintArrowHolderFill)
+        canvas.drawCircle(0f, centerY * 2f, radius / 6, paintArrowHolderStroke)
+
+        canvas.restore()
+    }
+
+    private fun drawHand(canvas: Canvas, loc: Double, hand: Int) {
+        val paintHands = Paint().apply {
+            color = Color.WHITE
+            style = Paint.Style.STROKE
+
+
+            when (hand) {
+                1 -> strokeWidth = SCALE_SIZE * 0.5f
+                2 -> strokeWidth = SCALE_SIZE * 0.3f
+                3 -> {
+                    strokeWidth = SCALE_SIZE * 0.2f
+                    color = ARROW_COLOR
+                }
+            }
+        }
+        val angle = Math.PI * loc / 30 - Math.PI / 2
+        val handRadius = if (hand == 1) {
+            radius * 0.7
+        } else {
+            radius * 0.9
+        }
+        canvas.drawLine(0f, centerY * 2,
+            (cos(angle) * handRadius).toFloat(),
+            (centerY * 2 + sin(angle) * handRadius).toFloat(),
+            paintHands
+        )
+    }
+
 
     override fun setSpeedChanged(speed: Float) {
         setSpeedAnimated(speed)
