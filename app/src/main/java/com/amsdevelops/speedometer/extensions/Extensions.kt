@@ -9,10 +9,3 @@ import io.reactivex.disposables.Disposable
 fun Disposable.addTo(autoDisposable: AutoDisposable) {
     autoDisposable.add(this)
 }
-
-//Dimensions
-fun Float.pxFromDp() =
-    this * App.instance.resources.displayMetrics.density
-
-fun Float.pxFromSp() =
-    this * App.instance.resources.displayMetrics.density

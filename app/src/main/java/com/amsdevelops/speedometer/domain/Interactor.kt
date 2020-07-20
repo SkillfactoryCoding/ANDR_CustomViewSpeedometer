@@ -21,7 +21,6 @@ class Interactor(val repository: Repository) {
                     repository.speedCacheMock.onNext(it)
                 }
             )
-
     }
 
     private fun mockSpeedArray(): Iterable<Int> {

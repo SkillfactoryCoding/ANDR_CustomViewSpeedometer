@@ -39,7 +39,6 @@ class SpeedometerCustomView @JvmOverloads constructor(
     private val rect = Rect()
     private var isInit = false
 
-    //Drawing colors
     private var DASH_COLOR = Color.WHITE
     private var DIGIT_COLOR = Color.WHITE
     private var ARROW_COLOR = Color.RED
@@ -49,14 +48,14 @@ class SpeedometerCustomView @JvmOverloads constructor(
     private var DIGIT_SPEED_ENABLED = true
     private var HORIZONTAL_DIGITS = false
 
-    //Scale configuration
     private var centerX = 0f
     private var centerY = 0f
     private var radius = 0f
 
     init {
         if (!isInit) {
-            val a = context.theme.obtainStyledAttributes(attrs, R.styleable.SpeedometerCustomView, 0, 0)
+            val a =
+                context.theme.obtainStyledAttributes(attrs, R.styleable.SpeedometerCustomView, 0, 0)
 
             try {
                 maxSpeed = a.getFloat(
@@ -67,11 +66,19 @@ class SpeedometerCustomView @JvmOverloads constructor(
                 DIGIT_COLOR = a.getColor(R.styleable.SpeedometerCustomView_digitColor, DIGIT_COLOR)
                 DASH_COLOR = a.getColor(R.styleable.SpeedometerCustomView_dashColor, DASH_COLOR)
                 ARROW_COLOR = a.getColor(R.styleable.SpeedometerCustomView_arrowColor, ARROW_COLOR)
-                BACKGROUND_COLOR = a.getColor(R.styleable.SpeedometerCustomView_backgroundColor, BACKGROUND_COLOR)
-                SCALE_SIZE = a.getDimension(R.styleable.SpeedometerCustomView_scaleTextSize, SCALE_SIZE)
+                BACKGROUND_COLOR =
+                    a.getColor(R.styleable.SpeedometerCustomView_backgroundColor, BACKGROUND_COLOR)
+                SCALE_SIZE =
+                    a.getDimension(R.styleable.SpeedometerCustomView_scaleTextSize, SCALE_SIZE)
                 DIGIT_SPEED_ENABLED =
-                    a.getBoolean(R.styleable.SpeedometerCustomView_digitSpeedTextEnabled, DIGIT_SPEED_ENABLED)
-                HORIZONTAL_DIGITS = a.getBoolean(R.styleable.SpeedometerCustomView_horizontalDigits, HORIZONTAL_DIGITS)
+                    a.getBoolean(
+                        R.styleable.SpeedometerCustomView_digitSpeedTextEnabled,
+                        DIGIT_SPEED_ENABLED
+                    )
+                HORIZONTAL_DIGITS = a.getBoolean(
+                    R.styleable.SpeedometerCustomView_horizontalDigits,
+                    HORIZONTAL_DIGITS
+                )
                 DASHES_STEP = a.getInt(R.styleable.SpeedometerCustomView_dashesStep, DASHES_STEP)
             } finally {
                 a.recycle()
@@ -186,7 +193,6 @@ class SpeedometerCustomView @JvmOverloads constructor(
         }
         drawArrow(canvas)
         if (DIGIT_SPEED_ENABLED) drawReadings(canvas)
-
         drawClock(canvas)
         drawHands(canvas)
 
@@ -201,15 +207,15 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
     private fun drawScaleBackground(canvas: Canvas) {
         canvas.save()
+
         canvas.translate(centerX, centerY)
         canvas.rotate(135f)
         canvas.scale(centerX, centerY)
 
         val scale = 0.93f
-
         val step = Math.PI * 1.5 / maxSpeed
 
-        for (i in 0 .. maxSpeed.toInt() step DASHES_STEP) {
+        for (i in 0..maxSpeed.toInt() step DASHES_STEP) {
             val angle = Math.PI * 1.5 - (step * i)
             val x1 = (cos(angle)).toFloat()
             val y1 = (sin(angle)).toFloat()
@@ -221,22 +227,21 @@ class SpeedometerCustomView @JvmOverloads constructor(
             y2 = y1 * scale
 
             if (i % 10 == 0) {
-                canvas.drawLine( x1, y1, x2, y2, dashPaintWide)
+                canvas.drawLine(x1, y1, x2, y2, dashPaintWide)
             } else {
-                canvas.drawLine( x1, y1, x2, y2, dashPaintThin)
+                canvas.drawLine(x1, y1, x2, y2, dashPaintThin)
             }
 
         }
+
         canvas.restore()
     }
 
     private fun drawLegendHorizontally(canvas: Canvas) {
-        canvas.save()
-
         val countOfDashes = maxSpeed / 10
         val space = maxSpeed / 20
 
-        for (i in 0 .. maxSpeed.toInt() step 10) {
+        for (i in 0..maxSpeed.toInt() step 10) {
             val tmp = i.toString()
 
             digitsPaintBold.getTextBounds(tmp, 0, tmp.length, rect)
@@ -248,8 +253,6 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
             canvas.drawText(tmp, x, y, digitThickness(i))
         }
-
-        canvas.restore()
     }
 
     private fun drawLegendAroundCircle(canvas: Canvas) {
@@ -269,7 +272,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
             canvas.drawTextOnPath(
                 digitText,
                 circle,
-                ((i * theeForthCircumference / maxSpeed) - digitTextLength/2).toFloat(),
+                ((i * theeForthCircumference / maxSpeed) - digitTextLength / 2).toFloat(),
                 0f,
                 digitThickness(i)
             )
@@ -312,8 +315,8 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
         path.moveTo(centerX - advance / 2, centerY)
         path.lineTo(centerX + advance / 2, centerY)
-        canvas.drawTextOnPath(message, path, 0f, SCALE_SIZE / 2.5f, readingPaint)
 
+        canvas.drawTextOnPath(message, path, 0f, SCALE_SIZE / 2.5f, readingPaint)
     }
 
     private fun drawClock(canvas: Canvas) {
@@ -336,7 +339,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
             canvas.drawText(text, x, y, clockPaint)
         }
-
+        
         canvas.restore()
     }
 
@@ -385,7 +388,8 @@ class SpeedometerCustomView @JvmOverloads constructor(
         } else {
             radius * 0.9
         }
-        canvas.drawLine(0f, centerY * 2,
+        canvas.drawLine(
+            0f, centerY * 2,
             (cos(angle) * handRadius).toFloat(),
             (centerY * 2 + sin(angle) * handRadius).toFloat(),
             paintHands
@@ -411,7 +415,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
         invalidate()
     }
 
-    private fun checkLimits(speed: Float)= when {
+    private fun checkLimits(speed: Float) = when {
         speed > maxSpeed -> {
             maxSpeed
         }
