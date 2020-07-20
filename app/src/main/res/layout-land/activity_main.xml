@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/darker_gray"
     tools:context=".presentation.view.MainActivity">
 
     <com.amsdevelops.speedometer.presentation.customviews.speedometer.SpeedometerCustomView
         android:id="@+id/speedometer"
         android:layout_margin="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:horizontalDigits="false"
-        app:scaleTextSize="20sp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:horizontalDigits="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:maxSpeed="180" />
@@ -24,32 +22,32 @@
         android:id="@+id/button_decrease"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginBottom="16dp"
         android:text="decrease"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/button_test"
+        app:layout_constraintEnd_toEndOf="@+id/button_increase"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/button_increase"
+        app:layout_constraintTop_toBottomOf="@+id/button_increase" />
 
     <Button
         android:id="@+id/button_increase"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
         android:text="increase"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/button_decrease"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/speedometer"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_test"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         android:text="Init test"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button_increase"
-        app:layout_constraintStart_toEndOf="@+id/button_decrease" />
+        app:layout_constraintEnd_toEndOf="@+id/button_decrease"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/button_decrease"
+        app:layout_constraintTop_toBottomOf="@+id/button_decrease" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
