@@ -243,15 +243,16 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
         for (i in 0..maxSpeed.toInt() step 10) {
             val tmp = i.toString()
+            val digitPaint = digitThickness(i)
 
-            digitsPaintBold.getTextBounds(tmp, 0, tmp.length, rect)
+            digitPaint.getTextBounds(tmp, 0, tmp.length, rect)
 
             val angle = Math.PI * 1.5 / countOfDashes * (i / 10 + space)
 
             val x = (centerX + cos(angle) * radius * 0.8 - rect.width() / 2).toFloat()
             val y = (centerY + sin(angle) * radius * 0.8 + rect.height() / 2).toFloat()
 
-            canvas.drawText(tmp, x, y, digitThickness(i))
+            canvas.drawText(tmp, x, y, digitPaint)
         }
     }
 
@@ -266,7 +267,9 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
         for (i in 0..maxSpeed.toInt() step increment) {
             val digitText = i.toString()
-            val digitTextLength = round(digitsPaintBold.measureText(digitText))
+            val digitPaint = digitThickness(i)
+
+            val digitTextLength = round(digitPaint.measureText(digitText))
 
             circle.addCircle(centerX, centerY, radius * 0.8f, Path.Direction.CW)
             canvas.drawTextOnPath(
@@ -274,7 +277,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
                 circle,
                 ((i * theeForthCircumference / maxSpeed) - digitTextLength / 2).toFloat(),
                 0f,
-                digitThickness(i)
+                digitPaint
             )
         }
 
@@ -336,7 +339,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
             val angle = Math.PI / 6 * (number - 3)
 
             val x = (cos(angle) * radius * 0.8 - rect.width() / 2).toFloat()
-            val y = (radius * 2 + sin(angle) * radius * 0.8 + rect.width() / 2).toFloat()
+            val y = (radius * 2 + sin(angle) * radius * 0.8 + rect.height() / 2).toFloat()
 
             canvas.drawText(text, x, y, clockPaint)
         }
@@ -351,16 +354,11 @@ class SpeedometerCustomView @JvmOverloads constructor(
         canvas.scale(scaleX * 0.3f, scaleY * 0.3f)
 
         val calendar = Calendar.getInstance()
-        var hour = calendar.get(Calendar.HOUR_OF_DAY)
-        hour = if (hour > 12) {
-            hour - 12
-        } else {
-            hour
-        }
+        val hour = calendar.get(Calendar.HOUR)
 
-        drawHand(canvas, ((hour + calendar.get(Calendar.MINUTE) / 60) * 5f).toDouble(), 1)
-        drawHand(canvas, calendar.get(Calendar.MINUTE).toDouble(), 2)
-        drawHand(canvas, calendar.get(Calendar.SECOND).toDouble(), 3)
+        drawHand(canvas, ((hour + calendar.get(Calendar.MINUTE) / 60.0) * 5f), SpeedometerConstants.HOUR_HAND)
+        drawHand(canvas, calendar.get(Calendar.MINUTE).toDouble(), SpeedometerConstants.MINUTE_HAND)
+        drawHand(canvas, calendar.get(Calendar.SECOND).toDouble(), SpeedometerConstants.SECOND_HAND)
 
         canvas.drawCircle(0f, radius * 2f, radius / 6, paintArrowHolderFill)
         canvas.drawCircle(0f, radius * 2f, radius / 6, paintArrowHolderStroke)
@@ -375,16 +373,16 @@ class SpeedometerCustomView @JvmOverloads constructor(
 
 
             when (hand) {
-                1 -> strokeWidth = SCALE_SIZE * 0.5f
-                2 -> strokeWidth = SCALE_SIZE * 0.3f
-                3 -> {
+                SpeedometerConstants.HOUR_HAND -> strokeWidth = SCALE_SIZE * 0.5f
+                SpeedometerConstants.MINUTE_HAND -> strokeWidth = SCALE_SIZE * 0.3f
+                SpeedometerConstants.SECOND_HAND -> {
                     strokeWidth = SCALE_SIZE * 0.2f
                     color = ARROW_COLOR
                 }
             }
         }
         val angle = Math.PI * loc / 30 - Math.PI / 2
-        val handRadius = if (hand == 1) {
+        val handRadius = if (hand == SpeedometerConstants.HOUR_HAND) {
             radius * 0.7
         } else {
             radius * 0.9

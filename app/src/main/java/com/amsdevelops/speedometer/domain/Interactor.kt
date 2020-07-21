@@ -25,7 +25,7 @@ class Interactor(val repository: Repository) {
 
     private fun mockSpeedArray(): Iterable<Int> {
         val list = mutableListOf<Int>()
-        repeat((0 .. 2).count()) {
+        repeat((0 .. 4).count()) {
             val randomSpeed = (0 .. 140).random()
             list.add(randomSpeed)
         }
