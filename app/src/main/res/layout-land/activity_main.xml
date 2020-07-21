@@ -21,6 +21,25 @@
             dashesStep - sets amount of dashes
         -->
 
+    <com.amsdevelops.speedometer.presentation.customviews.speedometer.SpeedometerCustomView
+        android:id="@+id/speedometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:arrowColor="@android:color/holo_red_dark"
+        app:backgroundColor="@android:color/background_dark"
+        app:currentSpeed="0"
+        app:scaleTextSize="20sp"
+        app:maxSpeed="180"
+        app:dashColor="@android:color/white"
+        app:dashesStep="2"
+        app:digitColor="@android:color/white"
+        app:digitSpeedTextEnabled="true"
+        app:horizontalDigits="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button_decrease"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/button_decrease"
         android:layout_width="wrap_content"
@@ -36,6 +55,7 @@
         android:id="@+id/button_increase"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
         android:text="@string/plus_ten"
         app:layout_constraintBottom_toTopOf="@+id/button_decrease"
         app:layout_constraintEnd_toEndOf="parent"
@@ -51,12 +71,5 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/button_decrease"
         app:layout_constraintTop_toBottomOf="@+id/button_decrease" />
-
-    <com.amsdevelops.speedometer.presentation.customviews.speedometer.SpeedometerCustomView
-        android:id="@+id/speedometerCustomView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

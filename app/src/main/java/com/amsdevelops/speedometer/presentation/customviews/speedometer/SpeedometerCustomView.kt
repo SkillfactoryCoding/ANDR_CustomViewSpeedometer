@@ -168,10 +168,11 @@ class SpeedometerCustomView @JvmOverloads constructor(
         val chosenWidth = chooseDimension(widthMode, widthSize)
         val chosenHeight = chooseDimension(heightMode, heightSize)
 
-        centerX = chosenWidth.div(2f)
-        centerY = chosenHeight.div(2f)
+        val minSide = min(chosenWidth, chosenHeight)
+        centerX = minSide.div(2f)
+        centerY = minSide.div(2f)
 
-        setMeasuredDimension(chosenWidth, chosenHeight)
+        setMeasuredDimension(minSide, minSide)
     }
 
     private fun chooseDimension(mode: Int, size: Int) =
