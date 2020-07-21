@@ -61,7 +61,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initFullScreen() {val flags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+    private fun initFullScreen() {
+        val flags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -70,6 +71,8 @@ class MainActivity : AppCompatActivity() {
                 or View.KEEP_SCREEN_ON)
 
         window.decorView.systemUiVisibility = flags
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val decorView = window.decorView
         decorView
