@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="SpeedometerCustomView">
-        <attr name="maxSpeed" format="float" />
+        <attr name="maxSpeed" format="integer" />
         <attr name="currentSpeed" format="float" />
         <attr name="dashesStep" format="integer" />
         <attr name="dashColor" format="color" />

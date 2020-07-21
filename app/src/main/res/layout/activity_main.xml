@@ -32,7 +32,7 @@
         app:dashesStep="2"
         app:digitColor="@android:color/white"
         app:digitSpeedTextEnabled="true"
-        app:horizontalDigits="true"
+        app:horizontalDigits="false"
         app:layout_constraintBottom_toTopOf="@+id/button_test"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

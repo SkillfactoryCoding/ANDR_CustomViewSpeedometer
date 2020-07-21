@@ -1,7 +1,7 @@
 package com.amsdevelops.speedometer.presentation.view
 
-import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.viewModels
@@ -16,7 +16,9 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
+import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,31 +35,48 @@ class MainActivity : AppCompatActivity() {
         initFullScreen()
 
         App.instance.appComponent.inject(this)
-        autoDisposable.bindTo(lifecycle)
-
-        viewModel.speedData
-            .subscribeOn(Schedulers.single())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = {
-                    Timber.e(it.localizedMessage)
-                },
-                onNext = {
-                    speedometer.setSpeedChanged(it.toFloat())
-                }
-            )
-            .addTo(autoDisposable)
+//        autoDisposable.bindTo(lifecycle)
+//
+//        viewModel.speedData
+//            .subscribeOn(Schedulers.single())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeBy(
+//                onError = {
+//                    Timber.e(it.localizedMessage)
+//                },
+//                onNext = {
+//                    speedometer.setSpeedChanged(it.toFloat())
+//                }
+//            )
+//            .addTo(autoDisposable)
 
         button_increase.setOnClickListener {
-            viewModel.changeSpeed((speedometer.getCurrentSpeed() + 10).toInt())
+            speedometer.setSpeedChanged(speedometer.getCurrentSpeed() + 10)
         }
 
         button_decrease.setOnClickListener {
-            viewModel.changeSpeed((speedometer.getCurrentSpeed() - 10).toInt())
+            speedometer.setSpeedChanged(speedometer.getCurrentSpeed() - 10)
         }
 
         button_test.setOnClickListener {
-            viewModel.initTest()
+//            thread {
+//                repeat((1..10).count()) {
+//                    Thread.sleep((1..2000).random().toLong())
+//                    runOnUiThread {
+//                        speedometer.setSpeedChanged((1..180).random().toFloat())
+//                    }
+//                }
+//            }
+            Timber.d(Thread.currentThread().toString())
+            Executors.newSingleThreadExecutor().execute {
+                repeat((1..10).count()) {
+                    Timber.d(Thread.currentThread().toString())
+                    Thread.sleep((1..2000).random().toLong())
+                    runOnUiThread {
+                        speedometer.setSpeedChanged((1..180).random().toFloat())
+                    }
+                }
+            }
         }
     }
 
