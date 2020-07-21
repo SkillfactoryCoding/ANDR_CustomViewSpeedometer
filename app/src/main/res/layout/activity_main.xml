@@ -22,7 +22,7 @@
     <com.amsdevelops.speedometer.presentation.customviews.speedometer.SpeedometerCustomView
         android:id="@+id/speedometer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:maxSpeed="180"
         app:currentSpeed="0"
         app:dashesStep="2"

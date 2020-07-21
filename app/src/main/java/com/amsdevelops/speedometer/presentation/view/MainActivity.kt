@@ -43,7 +43,6 @@ class MainActivity : AppCompatActivity() {
                     Timber.e(it.localizedMessage)
                 },
                 onNext = {
-                    Timber.e(it.toString())
                     speedometer.setSpeedChanged(it.toFloat())
                 }
             )
