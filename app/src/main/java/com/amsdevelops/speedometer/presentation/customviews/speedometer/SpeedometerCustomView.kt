@@ -340,7 +340,7 @@ class SpeedometerCustomView @JvmOverloads constructor(
         canvas.translate(centerX, centerY)
         canvas.rotate(limit)
 
-        canvas.drawLine(0f, 0f, scaleOfArrow, radius / scaleOfArrow, paintArrow)
+        canvas.drawLine(0f, 0f, scaleOfArrow, scaleOfArrow, paintArrow)
 
         canvas.drawCircle(0f, 0f, scaleOfCircle, paintArrowHolderFill)
         canvas.drawCircle(0f, 0f, scaleOfCircle, paintArrowHolderStroke)
