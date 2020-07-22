@@ -67,10 +67,8 @@ class MainActivity : AppCompatActivity() {
 //                    }
 //                }
 //            }
-            Timber.d(Thread.currentThread().toString())
             Executors.newSingleThreadExecutor().execute {
-                repeat((1..10).count()) {
-                    Timber.d(Thread.currentThread().toString())
+                repeat(10) {
                     Thread.sleep((1..2000).random().toLong())
                     runOnUiThread {
                         speedometer.setSpeedChanged((1..180).random().toFloat())
